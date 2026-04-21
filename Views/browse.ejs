@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Topics - MessageBoard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; }
+    .navbar { background:linear-gradient(90deg,#667eea,#764ba2) !important; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark navbar-expand-md mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/topics/dashboard">📋 MessageBoard</a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/topics/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
+        <a href="/topics/new"       class="btn btn-light btn-sm">+ New Topic</a>
+        <a href="/stats"            class="btn btn-outline-light btn-sm">📊 Stats</a>
+        <a href="/logout"           class="btn btn-outline-light btn-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <h4 class="mb-4 fw-semibold">All Topics</h4>
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <% if (allTopics.length === 0) { %>
+      <div class="alert alert-info">No topics exist yet. <a href="/topics/new">Create the first one!</a></div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table table-hover bg-white rounded shadow-sm">
+          <thead class="table-light">
+            <tr><th>Topic</th><th>Created by</th><th>Date</th><th class="text-end">Action</th></tr>
+          </thead>
+          <tbody>
+            <% allTopics.forEach(topic => { %>
+              <% const isSub = subIds.includes(topic._id.toString()); %>
+              <tr>
+                <td>
+                  <a href="/topics/<%= topic._id %>" class="fw-semibold text-decoration-none"><%= topic.title %></a>
+                  <% if (topic.description) { %><br><small class="text-muted"><%= topic.description %></small><% } %>
+                </td>
+                <td>@<%= topic.createdBy.username %></td>
+                <td class="text-muted small"><%= new Date(topic.createdAt).toLocaleDateString() %></td>
+                <td class="text-end">
+                  <% if (isSub) { %>
+                    <form method="POST" action="/topics/<%= topic._id %>/unsubscribe" class="d-inline">
+                      <button class="btn btn-outline-danger btn-sm">Unsubscribe</button>
+                    </form>
+                  <% } else { %>
+                    <form method="POST" action="/topics/<%= topic._id %>/subscribe" class="d-inline">
+                      <button class="btn btn-success btn-sm">Subscribe</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

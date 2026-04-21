@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= topic.title %> - MessageBoard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background:#f5f7fb; }
+    .navbar { background:linear-gradient(90deg,#667eea,#764ba2) !important; }
+    .msg-bubble { border-left:4px solid #667eea; background:#fff; border-radius:0 8px 8px 0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/topics/dashboard">📋 MessageBoard</a>
+      <div class="d-flex gap-2">
+        <a href="/topics/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
+        <a href="/topics/browse"    class="btn btn-outline-light btn-sm">Browse</a>
+        <a href="/stats"            class="btn btn-outline-light btn-sm">📊 Stats</a>
+        <a href="/logout"           class="btn btn-outline-light btn-sm">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container" style="max-width:760px;">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h3 class="fw-bold mb-0"><%= topic.title %></h3>
+        <small class="text-muted">
+          Created by @<%= topic.createdBy.username %>
+          · <%= new Date(topic.createdAt).toLocaleDateString() %>
+          · 👁 <%= topic.accessCount %> views
+        </small>
+        <% if (topic.description) { %><p class="mt-1 text-muted"><%= topic.description %></p><% } %>
+      </div>
+      <% if (isSubscribed) { %>
+        <form method="POST" action="/topics/<%= topic._id %>/unsubscribe">
+          <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Unsubscribe?')">Unsubscribe</button>
+        </form>
+      <% } else { %>
+        <form method="POST" action="/topics/<%= topic._id %>/subscribe">
+          <button class="btn btn-success btn-sm">Subscribe</button>
+        </form>
+      <% } %>
+    </div>
+    <hr>
+    <% if (messages.length === 0) { %>
+      <p class="text-muted text-center py-4 fst-italic">No messages yet. Be the first to post!</p>
+    <% } else { %>
+      <% messages.forEach(msg => { %>
+        <div class="msg-bubble p-3 mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="fw-semibold">@<%= msg.author.username %></span>
+            <span class="text-muted small"><%= new Date(msg.createdAt).toLocaleString() %></span>
+          </div>
+          <p class="mb-0"><%= msg.content %></p>
+        </div>
+      <% }) %>
+    <% } %>
+    <% if (isSubscribed) { %>
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Post a Message</h6>
+          <form method="POST" action="/topics/<%= topic._id %>/messages">
+            <div class="mb-3">
+              <textarea name="content" class="form-control" rows="3"
+                placeholder="Write your message..." required maxlength="2000"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Message</button>
+          </form>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="alert alert-warning mt-4">
+        Subscribe to post messages.
+        <form method="POST" action="/topics/<%= topic._id %>/subscribe" class="d-inline">
+          <button class="btn btn-sm btn-warning ms-2">Subscribe Now</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
