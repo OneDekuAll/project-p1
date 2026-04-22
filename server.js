@@ -1,10 +1,10 @@
 require('dotenv').config();
-const express       = require('express');
-const session       = require('express-session');
-const MongoStore    = require('connect-mongo');
+const express        = require('express');
+const session        = require('express-session');
+const MongoStore     = require('connect-mongo');
 const methodOverride = require('method-override');
-const path          = require('path');
-const Database      = require('./config/database');
+const path           = require('path');
+const Database       = require('./config/database');
 
 const app = express();
 
@@ -36,10 +36,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes (MVC - Controller layer)
+// Routes — /stats MUST come before /topics to prevent /:id catching it
 app.use('/',       require('./routes/auth'));
-app.use('/topics', require('./routes/topics'));
 app.use('/stats',  require('./routes/stats'));
+app.use('/topics', require('./routes/topics'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
